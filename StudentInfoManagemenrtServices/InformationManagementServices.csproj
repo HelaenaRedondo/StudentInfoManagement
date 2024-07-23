@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StudentInfoManagementData\StudentInfoManagementData.csproj" />
-    <ProjectReference Include="..\StudentInfoManagementModels\StudentInfoManagementModels.csproj" />
+    <ProjectReference Include="..\StudentInfoManagementData\InfoManageDb.csproj" />
+    <ProjectReference Include="..\StudentInfoManagementModels\InfoManagementModel.csproj" />
   </ItemGroup>
 
 </Project>

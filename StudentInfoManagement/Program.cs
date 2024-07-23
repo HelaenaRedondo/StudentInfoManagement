@@ -1,46 +1,39 @@
-﻿using AccountManagementData;
-using AccountManagementModels;
-using AccountManagementServices;
-using System.Security.Cryptography.X509Certificates;
-using AccountManagementData;
+﻿
+using System;
 
 
-
-namespace Client
+namespace StudentInfoManagement
 {
-    internal class Prog
+    internal class Program
     {
-        private static object sqlDbData;
-
         static void Main(string[] args)
         {
+            Console.WriteLine("INFORMATION MANAGEMENT SYSTEM");
+
+            InfoManageGetServ getServices = new InfoManageGetServ();
+            var users = getServices.GetAllInfo();
+
+            foreach (var item in users)
             {
 
-                List<Stud> usersFromDB = GetUsersFromDB();
-                foreach (var item in usersFromDB)
-                {
-                    Console.WriteLine(item.username);
-                    Console.WriteLine(item.password);
-                    Console.WriteLine(item.studentid);
-                    Console.WriteLine(item.age);
-                    Console.WriteLine(item.birthdate);
-                    Console.WriteLine(item.contact);
+                Console.WriteLine("Here's the Information:");
+                Console.WriteLine("FIRSTNAME" + item.firstname);
+                Console.WriteLine("MIDDLENAME:" + item.middlename);
+                Console.WriteLine("LASTNAME:" + item.lastname);
+                Console.WriteLine("Contact Number:" + item.contactnumber);
+                Console.WriteLine("ADDRESS:" + item.address);
+                Console.WriteLine("PASSWORD:" + item.password);
 
-                }
             }
 
-            //UserGetServices getServices = new UserGetServices();
-
-            //var users = getServices.GetUersByStatus(1);
-
-            //foreach (var item in users)
-            //{
-            // Console.Writeline(item.studentname);
-            //Console.WriteLine(item.password);
-            //}
         }
-
-        private static List<Stud> GetUsersFromDB() => SqlDbData.GetStud();
-
     }
 }
+
+
+
+
+
+
+
+

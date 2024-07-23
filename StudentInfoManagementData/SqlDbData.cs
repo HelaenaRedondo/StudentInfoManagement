@@ -1,140 +1,108 @@
-﻿using AccountManagementModels;
+﻿using StudentInfoManagement;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
-namespace AccountManagementData
+namespace InformationManagement
 {
     public class SqlDbData
     {
-        static string connectionString
-        = "Data Source =LILXX\\SQLEXPRESS; Initial Catalog = StudentInfoManagement; Integrated Security = True;";
+        private string connectionString = "Data Source=LILXX\\SQLEXPRESS;Initial Catalog=InformationManagement;Integrated Security=True;";
 
-        SqlConnection SqlConnection;
-
-        SqlConnection sqlConnection;
-        private string connection;
-
-        public SqlDbData()
+        public List<Information> GetInfo()
         {
-            this.sqlConnection = new SqlConnection(connection);
-        }
-        public List<Stud> GetStudent()
-        {
-            string SELECT = "Select * FROM Student";
+            List<Information> manage = new List<Information>();
 
-            SqlCommand selcom = new SqlCommand(SELECT, sqlConnection);
-
-            sqlConnection.Open();
-            List<Stud> stud = new List<Stud>();
-
-            SqlDataReader read = selcom.ExecuteReader();
-
-            while (read.Read())
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
-                string studentID = read["username"].ToString();
-                string name = read["password"].ToString();
-                string email = read["birthdate"].ToString();
-                string phonenum = read["email"].ToString();
-                string address = read["contact"].ToString();
+                string SELECT = "SELECT * FROM UserInfos"; // Adjust table name as needed
+                SqlCommand selectCommand = new SqlCommand(SELECT, sqlConnection);
 
-                Stud readStudent = new Stud();
-                readStudent.s_username = studentID;
-                readStudent.s_name = name;
-                readStudent.s_email = email;
-                readStudent.s_address = address;
+                sqlConnection.Open();
 
-                stud.Add(readStudent);
+                SqlDataReader reader = selectCommand.ExecuteReader();
 
+                while (reader.Read())
+                {
+                    Information readUser = new Information
+                    {
+                        firstname = reader["firstname"].ToString(),
+                        middlename = reader["middlename"].ToString(),
+                        lastname = reader["lastname"].ToString(),
+                        email = reader["email"].ToString(),
+                        contactnumber = reader["contactnumber"].ToString(),
+                        address = reader["address"].ToString(),
+                        password = reader["password"].ToString()
+                    };
+
+                    manage.Add(readUser);
+                }
             }
-            sqlConnection.Close();
 
-            return stud;
-        }
-        public int AddStudent(string studentID, string name, string email, string phonenum, string address)
-        {
-            int success;
-
-            string INSERT = "INSERT INTO Student VALUES (@StudentID, @Name, @Email, @Phone Number, @Address)";
-
-            SqlCommand incom = new SqlCommand(INSERT, sqlConnection);
-
-            incom.Parameters.AddWithValue("@StudentID", studentID);
-            incom.Parameters.AddWithValue("@Name", name);
-            incom.Parameters.AddWithValue("@Email", email);
-            incom.Parameters.AddWithValue("@Phone Number", phonenum);
-            incom.Parameters.AddWithValue("@Address", address);
-            sqlConnection.Close();
-
-            success = incom.ExecuteNonQuery();
-
-            sqlConnection.Close();
-
-            return success;
-
+            return manage;
         }
 
-        public int UpdateStudent(string studentID, string name, string email, string phonenum, string address)
+        public int AddUser(string firstname, string middlename, string lastname, string email, string contactnumber, string address, string password)
         {
-            int success;
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                string insertStatement = "INSERT INTO UserInfos (firstname, middlename, lastname, email, contactnumber, address, password) " +
+                                         "VALUES (@firstname, @middlename, @lastname, @email, @contactnumber, @address, @password)";
 
-            string UPDATE = $"UPDATE Student SET Name = @Name, Email = @Email, Phone Number = @Phone Number, Address = @Address WHERE StduentID = @StudentID";
+                SqlCommand insertCommand = new SqlCommand(insertStatement, sqlConnection);
 
+                insertCommand.Parameters.AddWithValue("@firstname", firstname);
+                insertCommand.Parameters.AddWithValue("@middlename", middlename);
+                insertCommand.Parameters.AddWithValue("@lastname", lastname);
+                insertCommand.Parameters.AddWithValue("@email", email);
+                insertCommand.Parameters.AddWithValue("@contactnumber", contactnumber);
+                insertCommand.Parameters.AddWithValue("@address", address);
+                insertCommand.Parameters.AddWithValue("@password", password);
 
-            SqlCommand upcom = new SqlCommand(UPDATE, sqlConnection);
+                sqlConnection.Open();
+                int success = insertCommand.ExecuteNonQuery();
+                sqlConnection.Close();
 
-            upcom.Parameters.AddWithValue("@Student ID", studentID);
-            upcom.Parameters.AddWithValue("@Name", name);
-            upcom.Parameters.AddWithValue("@Email", email);
-            upcom.Parameters.AddWithValue("@Phone Number", phonenum);
-            upcom.Parameters.AddWithValue("@Address", address);
-            sqlConnection.Close();
-
-            success = upcom.ExecuteNonQuery();
-
-            sqlConnection.Close();
-
-            return success;
+                return success;
+            }
         }
 
-        public int DeleteStudent(string studentID)
+        public int UpdateUser(string firstname, string password, string lastname)
         {
-            int success;
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                string updateStatement = "UPDATE Accounts SET password = @password WHERE firstname = @firstname";
 
-            string DELETE = $"DELETE FROM Student WHERE StudentID = @StudentID";
-            SqlCommand delcom = new SqlCommand(DELETE, sqlConnection);
-            sqlConnection.Open();
+                SqlCommand updateCommand = new SqlCommand(updateStatement, sqlConnection);
 
-            delcom.Parameters.AddWithValue("@StudentID", studentID);
+                updateCommand.Parameters.AddWithValue("@password", password);
+                updateCommand.Parameters.AddWithValue("@firstname", firstname);
 
-            success = delcom.ExecuteNonQuery();
+                sqlConnection.Open();
+                int success = updateCommand.ExecuteNonQuery();
+                sqlConnection.Close();
 
-            sqlConnection.Close();
-
-            return success;
+                return success;
+            }
         }
 
-        internal int DeleteUsers(string username)
+        public int DeleteUser(string firstname)
         {
-            throw new NotImplementedException();
-        }
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                string deleteStatement = "DELETE FROM Accounts WHERE firstname = @firstname";
 
-        internal object UpdateUsers(string username, string password, DateTime birthdate, bool studentid, string contact)
-        {
-            throw new NotImplementedException();
-        }
+                SqlCommand deleteCommand = new SqlCommand(deleteStatement, sqlConnection);
 
-        internal int AddUsers(string username, string password, DateTime birthdate, bool studentid, string contact)
-        {
-            throw new NotImplementedException();
-        }
+                deleteCommand.Parameters.AddWithValue("@firstname", firstname);
 
-        internal List<Stud> Get()
-        {
-            throw new NotImplementedException();
-        }
+                sqlConnection.Open();
+                int success = deleteCommand.ExecuteNonQuery();
+                sqlConnection.Close();
 
-        public static List<Stud> GetStud()
-        {
-            throw new NotImplementedException();
+                return success;
+            }
         }
     }
 }
